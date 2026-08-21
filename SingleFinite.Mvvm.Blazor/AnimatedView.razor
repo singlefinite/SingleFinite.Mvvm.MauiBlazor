@@ -1,0 +1,222 @@
+﻿@*
+// MIT License
+// Copyright (c) 2026 Single Finite
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+*@
+
+@using SingleFinite.Essentials
+@using SingleFinite.Mvvm.Blazor.Internal
+
+@implements IDisposable
+
+<div @attributes="AdjustedAttributes">
+    <div class="@ViewClasses[0]" style="--animation-duration: @AnimationDuration; place-self:@ViewAlignment;" disabled="@IsAnimating">
+        <DynamicComponent Type="@Views[0].ComponentType" Parameters="@Views[0].Parameters" />
+    </div>
+
+    <div class="@ViewClasses[1]" style="--animation-duration: @AnimationDuration; place-self:@ViewAlignment;" disabled="@IsAnimating">
+        <DynamicComponent Type="@Views[1].ComponentType" Parameters="@Views[1].Parameters" />
+    </div>
+</div>
+
+@code {
+
+    #region Fields
+
+    /// <summary>
+    /// The task scope for this view.
+    /// </summary>
+    private readonly ITaskScope _viewScope = new TaskScope();
+
+    /// <summary>
+    /// The job that animates fade in/out transitions.
+    /// </summary>
+    private ITaskJob? _animateJob;
+
+    /// <summary>
+    /// Used to throttle changes to the current view.
+    /// </summary>
+    private readonly ThrottlerLatest _throttler = new();
+
+    /// <summary>
+    /// Holds the current view.
+    /// </summary>
+    private IView? _currentView;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// The view that transitions using animation.
+    /// </summary>
+    [Parameter]
+    public IView? View { get; set; }
+
+    /// <summary>
+    /// The duration for the animation in milliseconds.
+    /// </summary>
+    [Parameter]
+    public int AnimationDurationInMilliseconds { get; set; } = 500;
+
+    /// <summary>
+    /// The alignment for displayed views.  This needs to be a place-self value.
+    /// Default is 'auto'.
+    /// </summary>
+    [Parameter]
+    public string ViewAlignment { get; set; } = "auto";
+
+    /// <summary>
+    /// When true, a transition to a view when there isn't currently a view
+    /// displayed will be animated.  Default is false.
+    /// </summary>
+    [Parameter]
+    public bool IsAnimatedOnStart { get; set; } = false;
+
+    /// <summary>
+    /// Holds the pass through attributes for this component.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+
+    /// <summary>
+    /// Holds the attributes for this component that have been adjusted to include additional values.
+    /// </summary>
+    private IDictionary<string, object> AdjustedAttributes { get; set; } = new Dictionary<string, object>();
+
+    /// <summary>
+    /// The animation duration using css notation.
+    /// </summary>
+    private string AnimationDuration => $"{AnimationDurationInMilliseconds}ms";
+
+    /// <summary>
+    /// The entering and exiting views displayed.
+    /// </summary>
+    private BlazorView[] Views { get; set; } = [BlazorView.Empty, BlazorView.Empty];
+
+    /// <summary>
+    /// The classes applied to the entering and exiting views.
+    /// </summary>
+    private string[] ViewClasses { get; set; } = ["top-view", "bottom-view"];
+
+    /// <summary>
+    /// The index of the current view.
+    /// </summary>
+    private int ViewIndex { get; set; } = 0;
+
+    /// <summary>
+    /// Set to true while the component is animating.
+    /// </summary>
+    private bool IsAnimating { get; set; } = false;
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Clean up view.
+    /// </summary>
+    public void Dispose()
+    {
+        _viewScope.Cancel();
+    }
+
+    /// <summary>
+    /// Update the state of this component.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        AdjustedAttributes = new Dictionary<string, object>(Attributes);
+
+        const string animatedViewContainerClass = "animated-view-container";
+
+        if (AdjustedAttributes.TryGetValue("class", out var existingClassNames))
+            AdjustedAttributes["class"] = $"{animatedViewContainerClass} {existingClassNames}";
+        else
+            AdjustedAttributes["class"] = animatedViewContainerClass;
+
+        if (_currentView != View)
+        {
+            var animate = _currentView is not null || IsAnimatedOnStart;
+            _currentView = View;
+            _throttler.Throttle(
+                action: () => UpdateCurrentView(
+                    view: _currentView,
+                    animate: animate
+                ),
+                limit: TimeSpan.FromMilliseconds(AnimationDurationInMilliseconds + 50)
+            );
+        }
+    }
+
+    /// <summary>
+    /// Transition to the new view.
+    /// </summary>
+    /// <param name="view">The new view.</param>
+    /// <param name="animate">When true the transition will be animated.</param>
+    private void UpdateCurrentView(IView? view, bool animate)
+    {
+        _animateJob?.Cancel();
+
+        var blazorView = view as BlazorView ?? BlazorView.Empty;
+        var exitingView = ViewIndex;
+        var enteringView = ViewIndex == 0 ? 1 : 0;
+
+        if (animate)
+        {
+            _animateJob = _viewScope.Run(async cancellationToken =>
+            {
+                IsAnimating = true;
+                Views[enteringView] = blazorView;
+                ViewClasses[exitingView] = "top-view fade-out";
+                ViewClasses[enteringView] = "bottom-view fade-in";
+
+                StateHasChanged();
+
+                await Task.Delay(
+                    millisecondsDelay: AnimationDurationInMilliseconds,
+                    cancellationToken: cancellationToken
+                );
+
+                Views[exitingView] = BlazorView.Empty;
+                ViewClasses[exitingView] = "bottom-view";
+                ViewClasses[enteringView] = "top-view";
+
+                ViewIndex = enteringView;
+
+                IsAnimating = false;
+                StateHasChanged();
+            });
+        }
+        else
+        {
+            Views[enteringView] = blazorView;
+            Views[exitingView] = BlazorView.Empty;
+            ViewClasses[exitingView] = "bottom-view";
+            ViewClasses[enteringView] = "top-view";
+
+            ViewIndex = enteringView;
+
+            StateHasChanged();
+        }
+    }
+
+    #endregion
+}

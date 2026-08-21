@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="ICON.png" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="Example.Models/Example.Models.csproj" Id="75fa7a54-a740-447c-8734-3f29d1607952" />
+  <Project Path="ExampleApp/ExampleApp.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="SingleFinite.Mvvm.Blazor/SingleFinite.Mvvm.Blazor.csproj" Id="d5c3840f-b74f-4ad7-9dd6-7e09a18e7ff2" />
+  <Project Path="SingleFinite.Mvvm.MauiBlazor/SingleFinite.Mvvm.MauiBlazor.csproj" />
+</Solution>

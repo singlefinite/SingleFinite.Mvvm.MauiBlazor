@@ -1,0 +1,240 @@
+﻿@*
+// MIT License
+// Copyright (c) 2026 Single Finite
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+*@
+
+@using SingleFinite.Essentials
+@using SingleFinite.Mvvm.Blazor.Internal
+@using SingleFinite.Mvvm.Services.Presenters
+
+@implements IDisposable
+
+<div @attributes="AdjustedAttributes">
+
+    <div class="grid-item" disabled="@IsDialogOpen">
+        @ChildContent
+    </div>
+
+    <div class="@ScrimClass" style="--animation-duration: @ScrimAnimationDuration; display: @Display;" />
+
+    <div class="grid-item dialog" style="--animation-duration: @ScrimAnimationDuration; display: @Display;">
+        <AnimatedView
+            View="@View"
+            AnimationDurationInMilliseconds="DialogAnimationDurationInMilliseconds"
+            ViewAlignment="center"
+            />
+    </div>
+</div>
+
+@code {
+    #region Fields
+
+    /// <summary>
+    /// Holds the current presenter.
+    /// </summary>
+    private IPresenter? _currentPresenter;
+
+    /// <summary>
+    /// The registration for the presenter change event.
+    /// </summary>
+    private IDisposable? _presenterChangedObserver;
+
+    /// <summary>
+    /// The task scope for this view.
+    /// </summary>
+    private readonly ITaskScope _viewScope = new TaskScope();
+
+    /// <summary>
+    /// The animate job.
+    /// </summary>
+    private ITaskJob? _animateJob;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// The duration for the dialog animation in milliseconds.
+    /// </summary>
+    [Parameter]
+    public int DialogAnimationDurationInMilliseconds { get; set; } = 350;
+
+    /// <summary>
+    /// The duration for the scrim animation in milliseconds.
+    /// </summary>
+    [Parameter]
+    public int ScrimAnimationDurationInMilliseconds { get; set; } = 150;
+
+    /// <summary>
+    /// Holds the child content for this component.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// Holds the attributes for this component.
+    /// </summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
+
+    /// <summary>
+    /// Holds the attributes for this component that have been adjusted to include additional values.
+    /// </summary>
+    private IDictionary<string, object> AdjustedAttributes { get; set; } = new Dictionary<string, object>();
+
+    /// <summary>
+    /// The scrim animation duration using css notation.
+    /// </summary>
+    private string ScrimAnimationDuration => $"{ScrimAnimationDurationInMilliseconds}ms";
+
+    /// <summary>
+    /// Presenter that provides the views to be displayed.
+    /// </summary>
+    [Parameter]
+    public IPresenter? Presenter { get; set; }
+
+    /// <summary>
+    /// The currently displayed view.
+    /// </summary>
+    private IView? View { get; set; }
+
+    /// <summary>
+    /// Indicates when the dialog is open.
+    /// </summary>
+    private bool IsDialogOpen { get; set; } = false;
+
+    /// <summary>
+    /// The display to apply to the dialog elements.
+    /// </summary>
+    public string Display => IsDialogOpen ? "block" : "none";
+
+    /// <summary>
+    /// The class to apply to the scrim.
+    /// </summary>
+    private string ScrimClass { get; set; } = "grid-item scrim";
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Clean up view.
+    /// </summary>
+    public void Dispose()
+    {
+        _presenterChangedObserver?.Dispose();
+        _viewScope.Cancel();
+    }
+
+    /// <summary>
+    /// Update the state of this component.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        AdjustedAttributes = new Dictionary<string, object>(Attributes);
+
+        const string gridContainerClass = "grid-container";
+
+        if (AdjustedAttributes.TryGetValue("class", out var existingClassNames))
+            AdjustedAttributes["class"] = $"{gridContainerClass} {existingClassNames}";
+        else
+            AdjustedAttributes["class"] = gridContainerClass;
+
+        if (_currentPresenter != Presenter)
+        {
+            _presenterChangedObserver?.Dispose();
+            _currentPresenter = Presenter;
+            _presenterChangedObserver = _currentPresenter?.CurrentChanged
+                ?.Observe()
+                ?.ThrottleLatest(limit: TimeSpan.FromMilliseconds(DialogAnimationDurationInMilliseconds + 50))
+                ?.OnEach(args =>
+                {
+                    UpdateCurrentDialog(
+                        view: args.View,
+                        animate: true
+                    );
+                });
+
+            UpdateCurrentDialog(
+                view: _currentPresenter?.Current,
+                animate: false
+            );
+        }
+    }
+
+    /// <summary>
+    /// Transition to the new dialog.
+    /// </summary>
+    /// <param name="view">The new dialog.</param>
+    /// <param name="animate">When true the transition will be animated.</param>
+    private void UpdateCurrentDialog(
+        IView? view,
+        bool animate
+    )
+    {
+        _animateJob?.Cancel();
+
+        _animateJob = _viewScope.Run(async cancellationToken =>
+        {
+            if (IsDialogOpen && view is not BlazorView)
+            {
+                View = null;
+                StateHasChanged();
+                await Task.Delay(
+                    millisecondsDelay: DialogAnimationDurationInMilliseconds,
+                    cancellationToken: cancellationToken
+                );
+
+                ScrimClass = "grid-item scrim fade-out";
+                StateHasChanged();
+                await Task.Delay(
+                    millisecondsDelay: ScrimAnimationDurationInMilliseconds,
+                    cancellationToken: cancellationToken
+                );
+
+                ScrimClass = "grid-item scrim";
+                IsDialogOpen = false;
+                StateHasChanged();
+            }
+            else if (IsDialogOpen && view is BlazorView)
+            {
+                View = view;
+                StateHasChanged();
+            }
+            else if (!IsDialogOpen && view is BlazorView)
+            {
+                IsDialogOpen = true;
+                ScrimClass = "grid-item scrim fade-in";
+                StateHasChanged();
+                await Task.Delay(
+                    millisecondsDelay: ScrimAnimationDurationInMilliseconds,
+                    cancellationToken: cancellationToken
+                );
+
+                ScrimClass = "grid-item scrim";
+                View = view;
+                StateHasChanged();
+            }
+        });
+    }
+
+    #endregion
+}

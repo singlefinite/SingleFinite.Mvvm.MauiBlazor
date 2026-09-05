@@ -43,8 +43,7 @@ public static class AppHostBuilderExtensions
     /// </typeparam>
     /// <typeparam name="TMainViewModelImplementation">
     /// The type of view model that will be built as the entry point for the
-    /// app.  The view registered for the view model must be of type 
-    /// <see cref="Window"/>.
+    /// app.
     /// </typeparam>
     /// <param name="builder">The builder to extend.</param>
     /// <returns>The builder that was passed in.</returns>
@@ -68,8 +67,7 @@ public static class AppHostBuilderExtensions
     /// </summary>
     /// <typeparam name="TMainViewModel">
     /// The type of view model that will be built as the entry point for the
-    /// app.  The view registered for the view model must be of type 
-    /// <see cref="Window"/>.
+    /// app.
     /// </typeparam>
     /// <param name="builder">The builder to extend.</param>
     /// <returns>The builder that was passed in.</returns>

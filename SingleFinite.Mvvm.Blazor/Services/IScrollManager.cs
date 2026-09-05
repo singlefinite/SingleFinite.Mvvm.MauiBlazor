@@ -40,6 +40,7 @@ public interface IScrollManager
     /// Set the current scroll position for the given element.
     /// </summary>
     /// <param name="element">A scrollable element.</param>
+    /// <param name="position">The position value to set.</param>
     /// <returns>The running task for the method.</returns>
     Task SetScrollPositionAsync(ElementReference element, double position);
 

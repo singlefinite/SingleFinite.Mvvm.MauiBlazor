@@ -27,9 +27,6 @@ namespace SingleFinite.Mvvm.MauiBlazor.Internal.Services;
 /// Implementation of <see cref="IMainDispatcher"/> that uses the
 /// <see cref="Dispatcher"/> from the main window to execute functions.
 /// </summary>
-/// <param name="appHost">
-/// The Maui app host whose window dispatcher will be used.
-/// </param>
 internal partial class DispatcherMain : IMainDispatcher
 {
     #region Methods

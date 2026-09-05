@@ -27,8 +27,11 @@ jobs:
       - name: Build the project
         run: dotnet build --configuration Release SingleFinite.Mvvm.MauiBlazor
 
-      - name: Create the package
-        run: dotnet pack --configuration Release SingleFinite.Mvvm.MauiBlazor
+      - name: Create the Blazor package
+        run: dotnet pack --configuration Release SingleFinite.Mvvm.Blazor -o packages
+
+      - name: Create the Maui Blazor package
+        run: dotnet pack --configuration Release SingleFinite.Mvvm.MauiBlazor -o packages
 
       - name: NuGet login (OIDC → temp API key)
         uses: NuGet/login@v1
@@ -37,4 +40,4 @@ jobs:
           user: ${{ secrets.NUGET_USER }}
 
       - name: Publish the package
-        run: dotnet nuget push SingleFinite.Mvvm.MauiBlazor\bin\Release\*.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}
+        run: dotnet nuget push packages\*.nupkg -s https://api.nuget.org/v3/index.json --api-key ${{steps.login.outputs.NUGET_API_KEY}}

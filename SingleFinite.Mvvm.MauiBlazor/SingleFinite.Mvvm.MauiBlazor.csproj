@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <Version>0.0.2.0</Version>
+    <Version>0.0.3.0</Version>
     <LangVersion>preview</LangVersion>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Title>SingleFinite MVVM Maui</Title>
+    <Title>SingleFinite MVVM MauiBlazor</Title>
     <Company>Single Finite</Company>
     <PackageProjectUrl>https://github.com/singlefinite/SingleFinite.Mvvm.MauiBlazor</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

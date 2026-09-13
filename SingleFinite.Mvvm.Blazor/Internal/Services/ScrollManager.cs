@@ -93,7 +93,7 @@ internal class ScrollManager(
     {
         _jsModule ??= await jsRuntime.InvokeAsync<IJSObjectReference>(
             identifier: "import",
-            "./_content/SingleFinite.Mvvm.Blazor/js/scrollManager.js"
+            "./_content/SingleFinite.Mvvm.Blazor/SingleFinite.Mvvm.Blazor.js"
         );
         return _jsModule;
     }

@@ -20,6 +20,11 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <StaticWebAssetFingerprintingEnabled>false</StaticWebAssetFingerprintingEnabled>
+    <WasmFingerprintAssets>false</WasmFingerprintAssets>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\ICON.png" Link="Properties\ICON.png">
       <Pack>True</Pack>

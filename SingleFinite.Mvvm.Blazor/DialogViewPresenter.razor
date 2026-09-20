@@ -200,14 +200,14 @@
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: DialogAnimationDurationInMilliseconds,
-                    cancellationToken: ActiveTaskScope.Current.CancellationToken
+                    cancellationToken: TaskScopeContext.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim fade-out";
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: ScrimAnimationDurationInMilliseconds,
-                    cancellationToken: ActiveTaskScope.Current.CancellationToken
+                    cancellationToken: TaskScopeContext.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim";
@@ -226,7 +226,7 @@
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: ScrimAnimationDurationInMilliseconds,
-                    cancellationToken: ActiveTaskScope.Current.CancellationToken
+                    cancellationToken: TaskScopeContext.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim";

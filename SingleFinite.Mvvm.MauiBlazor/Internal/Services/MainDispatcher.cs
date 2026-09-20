@@ -35,7 +35,8 @@ internal partial class MainDispatcher : TaskDispatcher, IMainDispatcher
     /// <inheritdoc/>
     public override Task<TResult> RunAsync<TResult>(
         Func<Task<TResult>> func,
-        ITaskScope scope
+        ITaskScope scope,
+        CancellationToken cancellationToken
     )
     {
         var dispatcher = Application.Current?.Dispatcher ??
@@ -47,7 +48,7 @@ internal partial class MainDispatcher : TaskDispatcher, IMainDispatcher
         {
             try
             {
-                SetActiveTaskScope(scope);
+                SetTaskScopeContext(scope, cancellationToken);
                 taskCompletionSource.SetResult(await func());
             }
             catch (Exception ex)

@@ -48,7 +48,11 @@ internal partial class MainDispatcher : TaskDispatcher, IMainDispatcher
         {
             try
             {
-                SetTaskScopeContext(scope, cancellationToken);
+                SetTaskContext(
+                    scope: scope,
+                    dispatcher: this,
+                    cancellationToken: cancellationToken
+                );
                 taskCompletionSource.SetResult(await func());
             }
             catch (Exception ex)

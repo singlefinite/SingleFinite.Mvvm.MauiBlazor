@@ -43,7 +43,7 @@
     /// <summary>
     /// The task scope for this view.
     /// </summary>
-    private readonly ITaskScope _viewScope = new TaskScope();
+    private readonly TaskScope _viewScope = new TaskScope();
 
     /// <summary>
     /// The job that animates fade in/out transitions.
@@ -181,7 +181,7 @@
 
         if (animate)
         {
-            _animateJob = _viewScope.Run(async cancellationToken =>
+            _animateJob = _viewScope.Run(async () =>
             {
                 IsAnimating = true;
                 Views[enteringView] = blazorView;
@@ -192,7 +192,7 @@
 
                 await Task.Delay(
                     millisecondsDelay: AnimationDurationInMilliseconds,
-                    cancellationToken: cancellationToken
+                    cancellationToken: ActiveTaskScope.Current.CancellationToken
                 );
 
                 Views[exitingView] = BlazorView.Empty;

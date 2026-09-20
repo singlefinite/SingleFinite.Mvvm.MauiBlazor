@@ -19,6 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using SingleFinite.Essentials;
 using SingleFinite.Mvvm.Services;
 
 namespace SingleFinite.Mvvm.MauiBlazor.Internal.Services;
@@ -27,14 +28,14 @@ namespace SingleFinite.Mvvm.MauiBlazor.Internal.Services;
 /// Implementation of <see cref="IMainDispatcher"/> that uses the
 /// <see cref="Dispatcher"/> from the main window to execute functions.
 /// </summary>
-internal partial class DispatcherMain : IMainDispatcher
+internal partial class MainDispatcher : TaskDispatcher, IMainDispatcher
 {
     #region Methods
 
     /// <inheritdoc/>
-    public Task<TResult> RunAsync<TResult>(
+    public override Task<TResult> RunAsync<TResult>(
         Func<Task<TResult>> func,
-        CancellationToken cancellationToken = default
+        ITaskScope scope
     )
     {
         var dispatcher = Application.Current?.Dispatcher ??
@@ -46,7 +47,7 @@ internal partial class DispatcherMain : IMainDispatcher
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                SetActiveTaskScope(scope);
                 taskCompletionSource.SetResult(await func());
             }
             catch (Exception ex)

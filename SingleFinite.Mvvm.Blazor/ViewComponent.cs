@@ -171,7 +171,7 @@ public class ViewComponent<TViewModel> :
         {
             if (disposing)
             {
-                ViewScope.Cancel();
+                (ViewScope as IDisposable)?.Dispose();
             }
 
             _isDisposed = true;

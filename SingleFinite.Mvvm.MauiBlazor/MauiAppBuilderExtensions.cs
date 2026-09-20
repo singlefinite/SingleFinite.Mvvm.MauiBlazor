@@ -55,7 +55,7 @@ public static class MauiAppBuilderExtensions
         var appHostBuilder = new BlazorAppHostBuilder<TMainViewModelImplementation>();
         appHostBuilder.AddSingleFiniteMvvmBlazor<TMainViewModelInterface, TMainViewModelImplementation>();
 
-        appHostBuilder.AddServices(services => services.AddSingleton<IMainDispatcher, DispatcherMain>());
+        appHostBuilder.AddServices(services => services.AddSingleton<IMainDispatcher, MainDispatcher>());
 
         configure?.Invoke(appHostBuilder);
 
@@ -85,7 +85,7 @@ public static class MauiAppBuilderExtensions
         var appHostBuilder = new BlazorAppHostBuilder<TMainViewModel>();
         appHostBuilder.AddSingleFiniteMvvmBlazor<TMainViewModel>();
 
-        appHostBuilder.AddServices(services => services.AddSingleton<IMainDispatcher, DispatcherMain>());
+        appHostBuilder.AddServices(services => services.AddSingleton<IMainDispatcher, MainDispatcher>());
 
         configure?.Invoke(appHostBuilder);
 

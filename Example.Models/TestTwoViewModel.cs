@@ -26,7 +26,7 @@ using SingleFinite.Mvvm.Services;
 namespace Example.Models;
 
 public partial class TestTwoViewModel(
-    IMainDispatcher dispatcher
+    ITaskScope scope
 ) : ViewModel
 {
     private int _counter = 0;
@@ -42,7 +42,7 @@ public partial class TestTwoViewModel(
 
     public void Increment()
     {
-        dispatcher.RunAsync(async () =>
+        scope.Run(async () =>
         {
             await Task.Delay(1000);
             _counter++;

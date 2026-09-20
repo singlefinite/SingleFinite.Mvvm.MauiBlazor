@@ -60,7 +60,7 @@
     /// <summary>
     /// The task scope for this view.
     /// </summary>
-    private readonly ITaskScope _viewScope = new TaskScope();
+    private readonly TaskScope _viewScope = new TaskScope();
 
     /// <summary>
     /// The animate job.
@@ -192,7 +192,7 @@
     {
         _animateJob?.Cancel();
 
-        _animateJob = _viewScope.Run(async cancellationToken =>
+        _animateJob = _viewScope.Run(async () =>
         {
             if (IsDialogOpen && view is not BlazorView)
             {
@@ -200,14 +200,14 @@
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: DialogAnimationDurationInMilliseconds,
-                    cancellationToken: cancellationToken
+                    cancellationToken: ActiveTaskScope.Current.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim fade-out";
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: ScrimAnimationDurationInMilliseconds,
-                    cancellationToken: cancellationToken
+                    cancellationToken: ActiveTaskScope.Current.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim";
@@ -226,7 +226,7 @@
                 StateHasChanged();
                 await Task.Delay(
                     millisecondsDelay: ScrimAnimationDurationInMilliseconds,
-                    cancellationToken: cancellationToken
+                    cancellationToken: ActiveTaskScope.Current.CancellationToken
                 );
 
                 ScrimClass = "grid-item scrim";

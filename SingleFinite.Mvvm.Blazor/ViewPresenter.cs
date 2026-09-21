@@ -76,8 +76,8 @@ public class ViewPresenter : IComponent, IDisposable
     /// <summary>
     /// Gets or sets a dictionary of parameters to be passed to the component.
     /// </summary>
-    [Parameter]
-    public IDictionary<string, object>? Parameters { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object>? Attributes { get; set; }
 
     #endregion
 
@@ -137,7 +137,7 @@ public class ViewPresenter : IComponent, IDisposable
             componentType: view.ComponentType
         );
 
-        if (Parameters.Combine(view.Parameters) is var attributes)
+        if (Attributes.Combine(view.Parameters) is var attributes)
         {
             builder.AddMultipleAttributes(
                 sequence: 1,

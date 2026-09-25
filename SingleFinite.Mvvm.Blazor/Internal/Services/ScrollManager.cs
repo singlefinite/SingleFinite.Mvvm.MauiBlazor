@@ -20,6 +20,7 @@
 // SOFTWARE.
 
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using SingleFinite.Essentials;
 using SingleFinite.Mvvm.Blazor.Services;
@@ -29,9 +30,9 @@ namespace SingleFinite.Mvvm.Blazor.Internal.Services;
 /// <summary>
 /// Implementation of <see cref="IScrollManager"/>.
 /// </summary>
-/// <param name="jsRuntime">Javascript interop runtime to use.</param>
+/// <param name="serviceProvider">Used to lookup IJSRuntime.</param>
 internal class ScrollManager(
-    IJSRuntime jsRuntime
+    IServiceProvider serviceProvider
 ) : IScrollManager
 {
     #region Fields
@@ -91,10 +92,12 @@ internal class ScrollManager(
     /// <returns>The javascript module.</returns>
     private async Task<IJSObjectReference> GetJSModuleAsync()
     {
-        _jsModule ??= await jsRuntime.InvokeAsync<IJSObjectReference>(
-            identifier: "import",
-            "./_content/SingleFinite.Mvvm.Blazor/SingleFinite.Mvvm.Blazor.js"
-        );
+        _jsModule ??= await serviceProvider
+            .GetRequiredService<IJSRuntime>()
+            .InvokeAsync<IJSObjectReference>(
+                identifier: "import",
+                "./_content/SingleFinite.Mvvm.Blazor/SingleFinite.Mvvm.Blazor.js"
+            );
         return _jsModule;
     }
 

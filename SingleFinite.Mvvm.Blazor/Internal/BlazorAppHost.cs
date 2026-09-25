@@ -36,55 +36,41 @@ internal partial class BlazorAppHost<TMainViewModel>(
 ) : AppHost(initializers), IBlazorAppHost
     where TMainViewModel : IViewModel
 {
-    #region Fields
-
-    /// <summary>
-    /// Holds the View.
-    /// </summary>
-    private IView? _view = null;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
-    /// If set, this service provider will be used to start the app host if the
-    /// View is accessed before the app host has been started.
+    /// The service provider used when the app host is started.
     /// </summary>
-    public IServiceProvider? ServiceProvider { get; set; } = null;
+    public IServiceProvider? ServiceProvider { get; set; }
 
     /// <inheritdoc/>
-    public IView View
-    {
-        get
-        {
-            if (_view is null && ServiceProvider is not null)
-                Start(ServiceProvider);
-
-            if (_view is null)
-                throw new InvalidOperationException(
-                    "The app host has not been started."
-                );
-
-            return _view;
-        }
-        private set
-        {
-            _view = value;
-        }
-    }
+    public IView? View { get; private set; }
 
     #endregion
 
     #region Methods
 
     /// <inheritdoc/>
-    public override void Start(IServiceProvider provider)
+    public override async Task<IView> StartAsync(
+        IServiceProvider serviceProvider
+    )
     {
-        if (_view is not null)
-            return;
+        ServiceProvider = serviceProvider;
+        return await StartAsync();
+    }
 
-        var viewAssembler = provider.GetRequiredService<IViewAssembler>();
+    /// <inheritdoc/>
+    public async Task<IView> StartAsync()
+    {
+        if (View is not null)
+            return View;
+
+        var serviceProvider = ServiceProvider ??
+            throw new InvalidOperationException(
+                message: "ServiceProvider has not been set."
+            );
+
+        var viewAssembler = serviceProvider.GetRequiredService<IViewAssembler>();
         var assembleResult = viewAssembler.AssembleFromDescriptor(
             viewModelDescriptor: new ViewModelDescriptor(
                 ViewModelType: typeof(TMainViewModel),
@@ -94,7 +80,9 @@ internal partial class BlazorAppHost<TMainViewModel>(
         View = assembleResult.View;
         assembleResult.Start();
 
-        base.Start(provider);
+        await base.StartAsync(serviceProvider);
+
+        return View;
     }
 
     #endregion

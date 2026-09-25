@@ -56,7 +56,12 @@ public static class AppHostBuilderExtensions
                 services =>
                 {
                     services.AddSingleton(
-                        serviceProvider => (TMainViewModelInterface)serviceProvider.GetRequiredService<IBlazorAppHost>().View.ViewModel
+                        serviceProvider =>
+                        {
+                            var blazorAppHost = serviceProvider.GetRequiredService<IBlazorAppHost>();
+                            var view = blazorAppHost.View ?? throw new InvalidOperationException("AppHost has not been started.");
+                            return (TMainViewModelInterface)view.ViewModel;
+                        }
                     );
                 }
             )

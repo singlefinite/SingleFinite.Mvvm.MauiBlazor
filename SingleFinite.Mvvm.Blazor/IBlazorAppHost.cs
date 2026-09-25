@@ -27,15 +27,14 @@ namespace SingleFinite.Mvvm.Blazor;
 public interface IBlazorAppHost
 {
     /// <summary>
-    /// The main view for the app.
+    /// The root view for the application.  This is only set after the
+    /// StartAsync method has been called and completed.
     /// </summary>
-    IView View { get; }
+    IView? View { get; }
 
     /// <summary>
     /// Start the app host.
     /// </summary>
-    /// <param name="serviceProvider">
-    /// The service provider to use with the app host.
-    /// </param>
-    void Start(IServiceProvider serviceProvider);
+    /// <returns>The root level view.</returns>
+    Task<IView> StartAsync();
 }

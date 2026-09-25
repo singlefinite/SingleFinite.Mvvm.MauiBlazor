@@ -37,6 +37,11 @@ public class ViewComponentRoot : IComponent
     /// </summary>
     private RenderHandle? _renderHandle;
 
+    /// <summary>
+    /// The root view.
+    /// </summary>
+    private IView? _view;
+
     #endregion
 
     #region Properties
@@ -64,11 +69,14 @@ public class ViewComponentRoot : IComponent
     }
 
     /// <inheritdoc />
-    public Task SetParametersAsync(ParameterView parameters)
+    public async Task SetParametersAsync(ParameterView parameters)
     {
+        if (AppHost is null)
+            return;
+
+        _view = await AppHost.StartAsync();
         parameters.SetParameterProperties(this);
         _renderHandle?.Render(Render);
-        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -77,7 +85,7 @@ public class ViewComponentRoot : IComponent
     /// <param name="builder">The builder to render to.</param>
     private void Render(RenderTreeBuilder builder)
     {
-        if (AppHost?.View is not BlazorView view)
+        if (_view is not BlazorView view)
             return;
 
         builder.OpenComponent(

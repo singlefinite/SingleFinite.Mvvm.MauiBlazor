@@ -70,15 +70,15 @@ internal partial class BlazorAppHost<TMainViewModel>(
                 message: "ServiceProvider has not been set."
             );
 
-        var viewAssembler = serviceProvider.GetRequiredService<IViewAssembler>();
-        var assembleResult = viewAssembler.AssembleFromDescriptor(
+        var viewComposer = serviceProvider.GetRequiredService<IViewComposer>();
+        var composition = viewComposer.ComposeFromDescriptor(
             viewModelDescriptor: new ViewModelDescriptor(
                 ViewModelType: typeof(TMainViewModel),
                 ViewModelParameters: []
             )
         );
-        View = assembleResult.View;
-        assembleResult.Start();
+        View = composition.View;
+        composition.Start();
 
         await base.StartAsync(serviceProvider);
 

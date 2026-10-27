@@ -33,13 +33,14 @@
         @ChildContent
     </div>
 
-    <div class="@ScrimClass" style="--animation-duration: @ScrimAnimationDuration; display: @Display;" />
+    <div class="@ScrimClass" style="--animation-duration: @DialogAnimationDuration; display: @Display;" />
 
-    <div class="grid-item dialog" style="--animation-duration: @ScrimAnimationDuration; display: @Display;">
+    <div class="grid-item dialog" style="--animation-duration: @DialogAnimationDuration; display: @Display;">
         <AnimatedView
             View="@View"
             AnimationDurationInMilliseconds="DialogAnimationDurationInMilliseconds"
             ViewAlignment="center"
+            IsAnimatedOnStart="true"
             />
     </div>
 </div>
@@ -75,13 +76,7 @@
     /// The duration for the dialog animation in milliseconds.
     /// </summary>
     [Parameter]
-    public int DialogAnimationDurationInMilliseconds { get; set; } = 350;
-
-    /// <summary>
-    /// The duration for the scrim animation in milliseconds.
-    /// </summary>
-    [Parameter]
-    public int ScrimAnimationDurationInMilliseconds { get; set; } = 150;
+    public int DialogAnimationDurationInMilliseconds { get; set; } = 250;
 
     /// <summary>
     /// Holds the child content for this component.
@@ -103,7 +98,7 @@
     /// <summary>
     /// The scrim animation duration using css notation.
     /// </summary>
-    private string ScrimAnimationDuration => $"{ScrimAnimationDurationInMilliseconds}ms";
+    private string DialogAnimationDuration => $"{DialogAnimationDurationInMilliseconds}ms";
 
     /// <summary>
     /// Presenter that provides the views to be displayed.
@@ -197,16 +192,11 @@
             if (IsDialogOpen && view is not BlazorView)
             {
                 View = null;
-                StateHasChanged();
-                await Task.Delay(
-                    millisecondsDelay: DialogAnimationDurationInMilliseconds,
-                    cancellationToken: TaskContext.CancellationToken
-                );
-
                 ScrimClass = "grid-item scrim fade-out";
                 StateHasChanged();
+
                 await Task.Delay(
-                    millisecondsDelay: ScrimAnimationDurationInMilliseconds,
+                    millisecondsDelay: DialogAnimationDurationInMilliseconds,
                     cancellationToken: TaskContext.CancellationToken
                 );
 
@@ -223,14 +213,15 @@
             {
                 IsDialogOpen = true;
                 ScrimClass = "grid-item scrim fade-in";
+                View = view;
                 StateHasChanged();
+
                 await Task.Delay(
-                    millisecondsDelay: ScrimAnimationDurationInMilliseconds,
+                    millisecondsDelay: DialogAnimationDurationInMilliseconds,
                     cancellationToken: TaskContext.CancellationToken
                 );
 
-                ScrimClass = "grid-item scrim";
-                View = view;
+                ScrimClass = "grid-item scrim";                
                 StateHasChanged();
             }
         });

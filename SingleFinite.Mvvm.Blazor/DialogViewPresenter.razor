@@ -27,7 +27,7 @@
 
 @implements IDisposable
 
-<div @attributes="AdjustedAttributes">
+<div class="grid-container">
 
     <div class="grid-item" disabled="@IsDialogOpen" inert="@IsDialogOpen">
         @ChildContent
@@ -85,17 +85,6 @@
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// Holds the attributes for this component.
-    /// </summary>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
-
-    /// <summary>
-    /// Holds the attributes for this component that have been adjusted to include additional values.
-    /// </summary>
-    private IDictionary<string, object> AdjustedAttributes { get; set; } = new Dictionary<string, object>();
-
-    /// <summary>
     /// The scrim animation duration using css notation.
     /// </summary>
     private string DialogAnimationDuration => $"{DialogAnimationDurationInMilliseconds}ms";
@@ -144,15 +133,6 @@
     /// </summary>
     protected override void OnParametersSet()
     {
-        AdjustedAttributes = new Dictionary<string, object>(Attributes);
-
-        const string gridContainerClass = "grid-container";
-
-        if (AdjustedAttributes.TryGetValue("class", out var existingClassNames))
-            AdjustedAttributes["class"] = $"{gridContainerClass} {existingClassNames}";
-        else
-            AdjustedAttributes["class"] = gridContainerClass;
-
         if (_currentPresenter != Presenter)
         {
             _presenterChangedObserver?.Dispose();

@@ -26,7 +26,7 @@
 
 @implements IDisposable
 
-<AnimatedView @attributes="Attributes" View="@View"/>
+<AnimatedView View="@View"/>
 
 @code {
     #region Fields
@@ -44,12 +44,6 @@
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Holds the attributes for this component.
-    /// </summary>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Presenter that provides the views to be displayed.

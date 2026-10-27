@@ -26,7 +26,7 @@
 
 @implements IDisposable
 
-<div @attributes="AdjustedAttributes">
+<div class="animated-view-container">
     <div class="@ViewClasses[0]" style="--animation-duration: @AnimationDuration; place-self:@ViewAlignment;" disabled="@IsAnimating">
         <DynamicComponent Type="@Views[0].ComponentType" Parameters="@Views[0].Parameters" />
     </div>
@@ -93,13 +93,7 @@
     /// <summary>
     /// Holds the pass through attributes for this component.
     /// </summary>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
-
-    /// <summary>
-    /// Holds the attributes for this component that have been adjusted to include additional values.
-    /// </summary>
-    private IDictionary<string, object> AdjustedAttributes { get; set; } = new Dictionary<string, object>();
+    private string Class { get; set; } = "";
 
     /// <summary>
     /// The animation duration using css notation.
@@ -143,15 +137,6 @@
     /// </summary>
     protected override void OnParametersSet()
     {
-        AdjustedAttributes = new Dictionary<string, object>(Attributes);
-
-        const string animatedViewContainerClass = "animated-view-container";
-
-        if (AdjustedAttributes.TryGetValue("class", out var existingClassNames))
-            AdjustedAttributes["class"] = $"{animatedViewContainerClass} {existingClassNames}";
-        else
-            AdjustedAttributes["class"] = animatedViewContainerClass;
-
         if (_currentView != View)
         {
             var animate = _currentView is not null || IsAnimatedOnStart;

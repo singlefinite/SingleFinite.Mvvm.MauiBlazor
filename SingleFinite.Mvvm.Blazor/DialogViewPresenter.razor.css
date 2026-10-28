@@ -32,6 +32,8 @@
 .grid-item {
     grid-row: 1;
     grid-column: 1;
+    min-width: 0;
+    min-height: 0;
 }
 
 .scrim {

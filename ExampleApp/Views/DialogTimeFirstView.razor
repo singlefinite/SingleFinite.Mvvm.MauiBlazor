@@ -1,0 +1,14 @@
+﻿@using Example.Models
+@using SingleFinite.Mvvm.Blazor
+
+@inherits ViewComponent<DialogTimeFirstViewModel>
+
+<div class="dialog">
+    <h3>Dialog Time First View</h3>
+    <button @onclick="ViewModel.Close">Close</button>
+    <button @onclick="ViewModel.OpenDialog">Next</button>
+</div>
+
+@code {
+
+}

@@ -161,8 +161,17 @@
         _animateJob?.Cancel();
 
         var blazorView = view as BlazorView ?? BlazorView.Empty;
+
         var exitingView = ViewIndex;
         var enteringView = ViewIndex == 0 ? 1 : 0;
+
+        // If an animation was interupted we need to keep whatever the index was pointing to.
+        //
+        if (IsAnimating)
+        {
+            exitingView = 1 - ViewIndex;
+            enteringView = 1 - enteringView;
+        }
 
         if (animate)
         {

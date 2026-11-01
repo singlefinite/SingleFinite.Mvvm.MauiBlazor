@@ -54,4 +54,9 @@ public partial class MainViewModel(
     {
         Dialogs.Show<DialogOneViewModel>();
     }
+
+    public void ShowTimeDialog()
+    {
+        Dialogs.Show<DialogTimeFirstViewModel>();
+    }
 }

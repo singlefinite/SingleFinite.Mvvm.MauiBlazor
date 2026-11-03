@@ -27,6 +27,8 @@
 
 @implements IDisposable
 
+@inject ITaskScope Scope;
+
 <div class="grid-container">
 
     <div class="grid-item" disabled="@IsDialogOpen" inert="@IsDialogOpen">
@@ -139,7 +141,10 @@
             _currentPresenter = Presenter;
             _presenterChangedObserver = _currentPresenter?.CurrentChanged
                 ?.Observe()
-                ?.ThrottleLatest(limit: TimeSpan.FromMilliseconds(DialogAnimationDurationInMilliseconds + 50))
+                ?.ThrottleLatest(
+                    limit: TimeSpan.FromMilliseconds(DialogAnimationDurationInMilliseconds + 50),
+                    scope: Scope
+                )
                 ?.OnEach(args =>
                 {
                     UpdateCurrentDialog(

@@ -23,11 +23,13 @@
 
 @using SingleFinite.Essentials
 @using SingleFinite.Mvvm.Blazor.Internal
+@using SingleFinite.Mvvm.Services
 @using SingleFinite.Mvvm.Services.Presenters
 
 @implements IDisposable
 
 @inject ITaskScope Scope;
+@inject IMainDispatcher MainDispatcher;
 
 <div class="grid-container">
 
@@ -143,7 +145,8 @@
                 ?.Observe()
                 ?.ThrottleLatest(
                     limit: TimeSpan.FromMilliseconds(DialogAnimationDurationInMilliseconds + 50),
-                    scope: Scope
+                    scope: Scope,
+                    dispatcher: MainDispatcher
                 )
                 ?.OnEach(args =>
                 {

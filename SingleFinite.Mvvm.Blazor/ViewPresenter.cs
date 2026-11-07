@@ -54,7 +54,7 @@ public class ViewPresenter : IComponent, IDisposable
     #region Properties
 
     /// <summary>
-    /// Gets or sets the type of the component to be rendered.
+    /// The presenter that provides views.
     /// </summary>
     [Parameter]
     public IPresenter? Presenter

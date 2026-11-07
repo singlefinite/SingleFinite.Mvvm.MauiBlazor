@@ -30,7 +30,7 @@
     <DialogViewPresenter Presenter="@ViewModel.Dialogs">
         <h3>MainView</h3>
 
-        <div style="height: 600px;">
+        <div style="height: 300px;">
             <AnimatedViewPresenter Presenter="@ViewModel.Stack"/>
         </div>
 
@@ -40,6 +40,10 @@
         <button @onclick="ViewModel.Next">Next</button>
         <button @onclick="ViewModel.ShowDialog">Show Dialog</button>
         <button @onclick="ViewModel.ShowTimeDialog">Show Time Dialog</button>
+
+        <br/>
+        <br/>
+        <View Value="@ViewModel.SimpleView" />
         
     </DialogViewPresenter>
 </div>

@@ -26,16 +26,22 @@ namespace Example.Models;
 
 public partial class MainViewModel(
     IStackPresenter stack,
-    IDialogPresenter dialogs
+    IDialogPresenter dialogs,
+    IPresenterList presenterList
 ) : ViewModel, IMainViewModel
 {
     public IStackPresenter Stack => stack;
 
     public IDialogPresenter Dialogs => dialogs;
 
+    public IView SimpleView { get; private set; }
+
     protected override void OnCreated()
     {
         Stack.Push<TestOneViewModel>();
+
+        presenterList.Add<SimpleViewModel>();
+        SimpleView = presenterList[0];
     }
 
     public void Next()

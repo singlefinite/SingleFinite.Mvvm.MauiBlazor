@@ -46,7 +46,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0" />
-    <PackageReference Include="SingleFinite.Mvvm" Version="0.0.78" />
+    <PackageReference Include="SingleFinite.Mvvm" Version="0.0.79" />
   </ItemGroup>
 
 </Project>

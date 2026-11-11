@@ -20,6 +20,7 @@
 // SOFTWARE.
 
 using SingleFinite.Mvvm;
+using SingleFinite.Mvvm.Services;
 using SingleFinite.Mvvm.Services.Presenters;
 
 namespace Example.Models;
@@ -27,21 +28,21 @@ namespace Example.Models;
 public partial class MainViewModel(
     IStackPresenter stack,
     IDialogPresenter dialogs,
-    IPresenterList presenterList
+    IViewList viewList
 ) : ViewModel, IMainViewModel
 {
     public IStackPresenter Stack => stack;
 
     public IDialogPresenter Dialogs => dialogs;
 
-    public IView SimpleView { get; private set; }
+    public IView? SimpleView { get; private set; }
 
     protected override void OnCreated()
     {
         Stack.Push<TestOneViewModel>();
 
-        presenterList.Add<SimpleViewModel>();
-        SimpleView = presenterList[0];
+        viewList.Add<SimpleViewModel>();
+        SimpleView = viewList[0];
     }
 
     public void Next()

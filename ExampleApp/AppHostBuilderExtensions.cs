@@ -36,6 +36,13 @@ public static class AppHostBuilderExtensions
     /// <returns></returns>
     public static AppHostBuilder AddExampleApp(
         this AppHostBuilder builder
+#pragma warning disable IDE0028 // Simplify collection initialization
     ) => builder
-        .AddViews(views => views.Scan(Assembly.GetAssembly(typeof(MauiProgram))));
+        .AddViews(views => views.Scan(
+            new List<Assembly?>
+            {
+                Assembly.GetAssembly(typeof(MauiProgram))
+            }
+        ));
+#pragma warning restore IDE0028 // Simplify collection initialization
 }

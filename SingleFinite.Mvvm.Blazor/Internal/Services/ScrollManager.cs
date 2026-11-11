@@ -31,8 +31,10 @@ namespace SingleFinite.Mvvm.Blazor.Internal.Services;
 /// Implementation of <see cref="IScrollManager"/>.
 /// </summary>
 /// <param name="serviceProvider">Used to lookup IJSRuntime.</param>
+/// <param name="exceptionHandler">Used to handle exceptions.</param>
 internal class ScrollManager(
-    IServiceProvider serviceProvider
+    IServiceProvider serviceProvider,
+    IExceptionHandler exceptionHandler
 ) : IScrollManager
 {
     #region Fields

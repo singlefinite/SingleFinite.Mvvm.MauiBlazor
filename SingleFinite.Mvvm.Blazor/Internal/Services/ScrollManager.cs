@@ -27,14 +27,14 @@ using SingleFinite.Mvvm.Blazor.Services;
 
 namespace SingleFinite.Mvvm.Blazor.Internal.Services;
 
+#pragma warning disable BL0016 // Unguarded JS interop call
+
 /// <summary>
 /// Implementation of <see cref="IScrollManager"/>.
 /// </summary>
 /// <param name="serviceProvider">Used to lookup IJSRuntime.</param>
-/// <param name="exceptionHandler">Used to handle exceptions.</param>
 internal class ScrollManager(
-    IServiceProvider serviceProvider,
-    IExceptionHandler exceptionHandler
+    IServiceProvider serviceProvider
 ) : IScrollManager
 {
     #region Fields

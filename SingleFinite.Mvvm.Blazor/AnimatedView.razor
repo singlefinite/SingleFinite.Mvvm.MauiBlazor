@@ -60,11 +60,6 @@
     /// </summary>
     private IView? _currentView;
 
-    /// <summary>
-    /// Set to true after the first call to OnParameterSet.
-    /// </summary>
-    private bool _isFirstOnParameterSet = true;
-
     #endregion
 
     #region Properties
@@ -139,7 +134,8 @@
     {
         if (_currentView != View)
         {
-            var animate = !_isFirstOnParameterSet || IsAnimatedOnStart;
+            var isStart = _currentView == null && View != null;
+            var animate = !isStart || IsAnimatedOnStart;
             _currentView = View;
             _throttler.Throttle(
                 action: () => UpdateCurrentView(
@@ -149,8 +145,6 @@
                 limit: TimeSpan.FromMilliseconds(AnimationDurationInMilliseconds + 50)
             );
         }
-
-        _isFirstOnParameterSet = false;
     }
 
     /// <summary>

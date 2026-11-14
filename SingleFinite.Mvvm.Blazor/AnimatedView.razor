@@ -60,6 +60,11 @@
     /// </summary>
     private IView? _currentView;
 
+    /// <summary>
+    /// Set to true after the first call to OnParameterSet.
+    /// </summary>
+    private bool _isFirstOnParameterSet = true;
+
     #endregion
 
     #region Properties
@@ -89,11 +94,6 @@
     /// </summary>
     [Parameter]
     public bool IsAnimatedOnStart { get; set; } = false;
-
-    /// <summary>
-    /// Holds the pass through attributes for this component.
-    /// </summary>
-    private string Class { get; set; } = "";
 
     /// <summary>
     /// The animation duration using css notation.
@@ -139,7 +139,7 @@
     {
         if (_currentView != View)
         {
-            var animate = _currentView is not null || IsAnimatedOnStart;
+            var animate = !_isFirstOnParameterSet || IsAnimatedOnStart;
             _currentView = View;
             _throttler.Throttle(
                 action: () => UpdateCurrentView(
@@ -149,6 +149,8 @@
                 limit: TimeSpan.FromMilliseconds(AnimationDurationInMilliseconds + 50)
             );
         }
+
+        _isFirstOnParameterSet = false;
     }
 
     /// <summary>

@@ -85,6 +85,8 @@ public class View : IComponent
             componentType: view.ComponentType
         );
 
+        builder.SetKey(view);
+
         if (Attributes.Combine(view.Parameters) is var attributes)
         {
             builder.AddMultipleAttributes(

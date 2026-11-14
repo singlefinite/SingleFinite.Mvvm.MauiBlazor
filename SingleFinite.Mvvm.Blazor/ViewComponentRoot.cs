@@ -93,6 +93,8 @@ public class ViewComponentRoot : IComponent
             componentType: view.ComponentType
         );
 
+        builder.SetKey(view);
+
         if (Parameters.Combine(view.Parameters) is var attributes)
         {
             builder.AddMultipleAttributes(

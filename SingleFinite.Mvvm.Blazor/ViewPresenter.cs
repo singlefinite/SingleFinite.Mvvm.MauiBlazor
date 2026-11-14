@@ -137,6 +137,8 @@ public class ViewPresenter : IComponent, IDisposable
             componentType: view.ComponentType
         );
 
+        builder.SetKey(view);
+
         if (Attributes.Combine(view.Parameters) is var attributes)
         {
             builder.AddMultipleAttributes(
